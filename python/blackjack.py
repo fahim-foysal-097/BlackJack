@@ -36,10 +36,16 @@ class Deck:
     def shuffle(self):
         """Shuffles the deck"""
 
-        # print("\nShuffling Deck")
+        print("\nShuffling Deck")
         shuffle(self.all_cards)
 
     def deal_one(self):
+        """Deals one card from the deck and reshuffles if the deck is empty"""
+
+        if len(self.all_cards) == 0: 
+            print("Deck is empty")
+            print("Reshuffling")
+            self.__init__()
         return self.all_cards.pop(-1)
 
 
@@ -76,7 +82,7 @@ def print_rules():
     9. If neither the player nor the dealer busts, the higher hand wins.
    10. If both the player and dealer have the same total, it's a push (tie), and the bet is returned.
     
-   GOAL : Reach 5000 before the game ends.""")
+   GOAL : Reach 3000 before the game ends.""")
 
 
 
@@ -138,9 +144,9 @@ def show_dealer_hand(dealer_hand):
 
     print(f"\nDealer Cards")
     print("----------------------")
-    print(f"*******")
+    print(f"*******")     # First card is hidden
     for i in range( (len(dealer_hand))-1 ):
-        print(dealer_hand[i+1])
+        print(f"{dealer_hand[i+1]} -- {dealer_hand[i+1].val()}")     # Prints only the second card
     print("\n")
 
 def show_dealer_full_hand(dealer_hand):
@@ -266,7 +272,7 @@ def main():
 
     while game_on:
 
-        if p.balance >= 5000: # Check if player reached the goal
+        if p.balance >= 3000: # Check if player reached the goal
             print("Congratulations!")
             print("You Have Reached The Goal! Well Done!")
 
@@ -284,7 +290,8 @@ def main():
         p_hand = []
         dealer_hand = []
 
-        if len(deck.all_cards) == 20:  # Reshuffle the deck if it's close to empty
+        if len(deck.all_cards) == 10:  # Reshuffle the deck if it's close to empty
+            print("\nReshuffling Deck")
             deck = Deck()
             deck.shuffle()
 
