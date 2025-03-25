@@ -4,7 +4,7 @@ from random import shuffle
 
 suits = ['Hearts', 'Diamonds', 'Spades', 'Clubs']
 ranks = ['Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Jack', 'Queen', 'King', 'Ace']
-values = {'Two':2, 'Three':3, 'Four':4, 'Five':5, 'Six':6, 'Seven':7, 'Eight':8, 'Nine':9, 'Ten':10, 'Jack':10, 'Queen':10, 'King':10, 'Ace':11} # Ace should be 1/11
+values = {'Two':2, 'Three':3, 'Four':4, 'Five':5, 'Six':6, 'Seven':7, 'Eight':8, 'Nine':9, 'Ten':10, 'Jack':10, 'Queen':10, 'King':10, 'Ace':11}
 
 class Card:
 
@@ -18,6 +18,7 @@ class Card:
         return f"{self.rank} of {self.suit}"
     
     def val(self):
+        """Returns the value of the card"""
         value = self.value
         return value
     
@@ -30,8 +31,7 @@ class Deck:
 
         for suit in suits:
             for rank in ranks:
-                card_created = Card(suit, rank)
-                self.all_cards.append(card_created)
+                self.all_cards.append(Card(suit, rank))
 
     def shuffle(self):
         """Shuffles the deck"""
@@ -112,11 +112,11 @@ def p_decision():
         else:
             if decision in ["Hit", "hit", "h"]:
                 return 1
-            elif decision in ["Stay", "stay", "s"]:
+            if decision in ["Stay", "stay", "s"]:
                 return 0
             
-def keep_playing():
-    """User Input - Returns True for yes and False for no"""
+def replay():
+    """User Input for replaying - Returns True for yes and False for no"""
     
     while True:
         decision = input("Do you want to continue playing? (Y/N) : ")
@@ -125,14 +125,14 @@ def keep_playing():
         else:
             if decision in ["Yes", "yes", "Y", "y"]:
                 return True
-            elif decision in ["No", "no", "N", "n"]:
+            if decision in ["No", "no", "N", "n"]:
                 return False
             
 
 def show_p_hand(p_hand):
     """Prints the player's hand"""
 
-    print(f"\nYour Cards")
+    print("\nYour Cards")
     print("--------------------")
     for card in p_hand:
         print(card)
@@ -142,9 +142,9 @@ def show_p_hand(p_hand):
 def show_dealer_hand(dealer_hand):
     """Prints the dealer's hand without the first card"""
 
-    print(f"\nDealer Cards")
+    print("\nDealer Cards")
     print("----------------------")
-    print(f"*******")     # First card is hidden
+    print("*******")     # First card is hidden
     for i in range( (len(dealer_hand))-1 ):
         print(f"{dealer_hand[i+1]} -- {dealer_hand[i+1].val()}")     # Prints only the second card
     print("\n")
@@ -152,7 +152,7 @@ def show_dealer_hand(dealer_hand):
 def show_dealer_full_hand(dealer_hand):
     """Prints the dealer's hand"""
 
-    print(f"\nDealer All Cards")
+    print("\nDealer All Cards")
     print("--------------------")
     for card in dealer_hand:
         print(card)
@@ -161,7 +161,7 @@ def show_dealer_full_hand(dealer_hand):
 
 
 def card_sum(cards):
-    """Returns the sum of the cards in the hand"""
+    """Returns the sum of the cards in the hand (including aces)"""
 
     total = 0
     aces = 0
@@ -174,24 +174,24 @@ def card_sum(cards):
         aces -= 1
     return total
 
-def blackjack_check(cards):
-    """Checks for blackjack"""
+def blackjack(cards):
+    """Returns True if the hand is a blackjack"""
 
     if card_sum(cards) == 21:
         return True
     else:
         return False
 
-def tie_check(cards_1, cards_2):
-    """Checks if it's a tie"""
+def tie(cards_1, cards_2):
+    """Returns True if it's a tie"""
 
     if card_sum(cards_1) == card_sum(cards_2):
         return True
     else:
         return False
     
-def bust_check(cards):
-    """Checks if the player has a bust"""
+def bust(cards):
+    """Returns True if the hand is bust"""
 
     if card_sum(cards) > 21:
         return True
@@ -200,7 +200,7 @@ def bust_check(cards):
     
     
 def player_close_to_21(p_hand, dealer_hand):
-    """Checks if the player is close to 21"""
+    """Returns True if the player is close to 21"""
 
     if card_sum(p_hand) > card_sum(dealer_hand):
         return True
@@ -209,10 +209,10 @@ def player_close_to_21(p_hand, dealer_hand):
     
 
 def init_check(p, p_hand, dealer_hand, bet):
-    """Checks if the player has won initially"""
+    """Returns True if the player has won initially or ties"""
     
-    if blackjack_check(p_hand):
-        if tie_check(p_hand, dealer_hand) == True:
+    if blackjack(p_hand):
+        if tie(p_hand, dealer_hand):
             print("BLACKJACK! It's a push - bet returned")
             p.add_balance(bet)
             return True
@@ -231,7 +231,7 @@ def hit_stay(p_hand,deck):
             p_hand.append(deck.deal_one())
             print(f"Your draw : {p_hand[-1]}")
             print(f"Cards value : {card_sum(p_hand)}")
-            if bust_check(p_hand) == True:
+            if bust(p_hand):
                 break
             else:
                 continue
@@ -239,16 +239,16 @@ def hit_stay(p_hand,deck):
             break
 
 def dealer_hit_stay(dealer_hand,deck):
-    """Dealer Hit or Stay"""
+    """Dealer - Hit or Stay"""
 
     while True:
         if card_sum(dealer_hand) < 17: # Hit if hand is less than 17
-                dealer_hand.append(deck.deal_one())
-                print(f"Dealer draws : {dealer_hand[-1]}, Cards value : {card_sum(dealer_hand)}\n")
-                if bust_check(dealer_hand) == True:
-                    break
-                else:
-                    continue
+            dealer_hand.append(deck.deal_one())
+            print(f"Dealer draws : {dealer_hand[-1]}, Cards value : {card_sum(dealer_hand)}\n")
+            if bust(dealer_hand):
+                break
+            else:
+                continue
         else: # Stay if hand is 17 or more
             break
 
@@ -305,8 +305,8 @@ def main():
 
         while True:
             #initial check
-            if init_check(p, p_hand, dealer_hand, bet) == True: #blackjack (+tie)
-                if keep_playing() == False:
+            if init_check(p, p_hand, dealer_hand, bet) == True: #blackjack or tie
+                if not replay():
                     game_on = False
                     return (round, p.balance)
                 else:
@@ -316,9 +316,18 @@ def main():
             # Player Turn - Hit/Stay
             hit_stay(p_hand, deck)
             show_p_hand(p_hand)
-            if bust_check(p_hand) == True: # Player Bust
+            if blackjack(p_hand): # Player Blackjack
+                print("BLACKJACK! You win {1.5 * bet}")
+                p.add_balance((bet + (bet * 1.5)))
+                if not replay():
+                    game_on = False
+                    return (round, p.balance)
+                else:
+                    round += 1
+                    break
+            elif bust(p_hand): # Player Bust
                 print(f"You Bust! You lose {bet}")
-                if keep_playing() == False:
+                if not replay():
                     game_on = False
                     return (round, p.balance)
                 else:
@@ -331,18 +340,18 @@ def main():
 
             dealer_hit_stay(dealer_hand, deck)
             show_dealer_full_hand(dealer_hand)
-            if bust_check(dealer_hand) == True: # Dealer Bust case
+            if bust(dealer_hand): # Dealer Bust case
                 p.add_balance(2*bet)
                 print(f"Dealer Bust! You win {bet}")
-                if keep_playing() == False:
+                if not replay():
                     return (round, p.balance)
                 else:
                     round += 1
                     break
-            elif tie_check(p_hand, dealer_hand) == True: # Tie case
+            elif tie(p_hand, dealer_hand): # Tie case
                 print("PUSH! Bet returned")
                 p.add_balance(bet)
-                if keep_playing() == False:
+                if not replay():
                     return (round, p.balance)
                 else:
                     round += 1
@@ -357,14 +366,14 @@ def main():
             if player_close_to_21(p_hand, dealer_hand) == True: # Player close to 21
                 print(f"You win {bet}")
                 p.add_balance(2*bet)
-                if keep_playing() == False:
+                if not replay():
                     return (round, p.balance)
                 else:
                     round += 1
                     break
             else:
                 print("Dealer Wins")
-                if keep_playing() == False:
+                if not replay():
                     return (round, p.balance)
                 else:
                     round += 1
