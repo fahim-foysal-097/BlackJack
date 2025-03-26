@@ -216,7 +216,7 @@ def init_check(p, p_hand, dealer_hand, bet):
             print("BLACKJACK! It's a push - bet returned")
             p.add_balance(bet)
             return True
-        print("BLACKJACK! You win {1.5 * bet}")
+        print(f"BLACKJACK! You win {1.5 * bet}")
         p.add_balance((bet + (bet * 1.5)))
         return True
     else:
@@ -231,7 +231,9 @@ def hit_stay(p_hand,deck):
             p_hand.append(deck.deal_one())
             print(f"Your draw : {p_hand[-1]}")
             print(f"Cards value : {card_sum(p_hand)}")
-            if bust(p_hand):
+            if blackjack(p_hand):
+                break
+            elif bust(p_hand):
                 break
             else:
                 continue
@@ -317,7 +319,7 @@ def main():
             hit_stay(p_hand, deck)
             show_p_hand(p_hand)
             if blackjack(p_hand): # Player Blackjack
-                print("BLACKJACK! You win {1.5 * bet}")
+                print(f"BLACKJACK! You win {1.5 * bet}")
                 p.add_balance((bet + (bet * 1.5)))
                 if not replay():
                     game_on = False
@@ -391,7 +393,5 @@ if __name__ == "__main__":
     print(f"Final Balance : {balance}")
     if balance < 1000:
         print(f"Money Lost : {1000-balance}")
-    elif balance == 1000:
-        print("Money Won : 0")
     else:
         print(f"Money Won : {balance-1000}")
